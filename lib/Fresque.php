@@ -463,16 +463,18 @@ class Fresque
 
         $env = $this->runtime['Default']['application_env'];
         $bin = $this->runtime['Default']['bin'];
+        $mongo = $this->runtime['Mongo']['db'];
 
         $this->debug('Will start ' . $count . ' workers');
 
         for ($i = 1; $i <= $count; $i++) {
-            $cmd = (($this->runtime['Default']['verbose']) ? 'VVERBOSE' : 'VERBOSE') . '=true ' . " \\\n".
-                'QUEUE=' . escapeshellarg($this->runtime['Default']['queue']) . " \\\n".
-                'PIDFILE=' . escapeshellarg($pidFile) . " \\\n".
-                'APPLICATION_ENV=' . escapeshellarg($env) ."\\\n".
-                'INTERVAL=' . escapeshellarg($this->runtime['Default']['interval']) . " \\\n".
-                'php' . escapeshellarg($bin) . "\\\n";
+            $cmd = (($this->runtime['Default']['verbose']) ? 'VVERBOSE' : 'VERBOSE') . '=true ' .
+                ' QUEUE=' . escapeshellarg($this->runtime['Default']['queue']) .
+                ' PIDFILE=' . escapeshellarg($pidFile) .
+                ' MONGO_DB=' . escapeshellarg($mongo) .
+                ' APPLICATION_ENV=' . escapeshellarg($env) .
+                ' INTERVAL=' . escapeshellarg($this->runtime['Default']['interval']) .
+                ' php ' . escapeshellarg($bin);
             $cmd .= ' >> '. escapeshellarg($this->runtime['Log']['filename']).' 2>&1 >/dev/null 2>&1 &';
 
             $this->debug('Starting worker (' . $i . ')');
