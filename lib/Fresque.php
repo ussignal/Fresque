@@ -461,8 +461,8 @@ class Fresque
                         . DS . str_replace('.', '', microtime(true));
         $count = $this->runtime['Default']['workers'];
 
-        $env = getenv('APPLICATION_ENV');
-        $bin = getenv('BIN');
+        $env = $this->runtime['Default']['application_env'];
+        $bin = $this->runtime['Default']['bin'];
 
         $this->debug('Will start ' . $count . ' workers');
 
