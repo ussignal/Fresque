@@ -474,6 +474,8 @@ class Fresque
                 ' MONGO_DB=' . escapeshellarg($mongo) .
                 ' APPLICATION_ENV=' . escapeshellarg($env) .
                 ' INTERVAL=' . escapeshellarg($this->runtime['Default']['interval']) .
+                ' LOGHANDLER=' . escapeshellarg($this->runtime['Log']['handler']) .
+                ' LOGHANDLERTARGET=' . escapeshellarg($this->runtime['Log']['target']) .
                 ' php ' . escapeshellarg($bin);
             $cmd .= ' >> '. escapeshellarg($this->runtime['Log']['filename']).' 2>&1 >/dev/null 2>&1 &';
 
