@@ -461,33 +461,19 @@ class Fresque
                         . DS . str_replace('.', '', microtime(true));
         $count = $this->runtime['Default']['workers'];
 
+        $env = getenv('APPLICATION_ENV');
+        $bin = getenv('BIN');
+
         $this->debug('Will start ' . $count . ' workers');
 
         for ($i = 1; $i <= $count; $i++) {
-
-            $libraryPath = $scheduler ? $this->runtime['Scheduler']['lib'] : $this->runtime['Fresque']['lib'];
-            $logFile = $scheduler ? $this->runtime['Scheduler']['log'] : $this->runtime['Log']['filename'];
-            $resqueBin = $scheduler ? './bin/resque-scheduler.php' : $this->getResqueBinFile($this->runtime['Fresque']['lib']);
-
-            $libraryPath = rtrim($libraryPath, '/');
-
-            $cmd = 'nohup ' . ($this->runtime['Default']['user'] !== $this->getProcessOwner() ? ('sudo -u '. escapeshellarg($this->runtime['Default']['user'])) : "") . " \\\n".
-            'bash -c "cd ' .
-            escapeshellarg($libraryPath) . '; ' . " \\\n".
-            (($this->runtime['Default']['verbose']) ? 'VVERBOSE' : 'VERBOSE') . '=true ' . " \\\n".
-            'QUEUE=' . escapeshellarg($this->runtime['Default']['queue']) . " \\\n".
-            'PIDFILE=' . escapeshellarg($pidFile) . " \\\n".
-            'APP_INCLUDE=' . escapeshellarg($this->runtime['Fresque']['include']) . " \\\n".
-            'RESQUE_PHP=' . escapeshellarg($this->runtime['Fresque']['lib'] . DS . 'lib' . DS . 'Resque.php') . " \\\n".
-            'INTERVAL=' . escapeshellarg($this->runtime['Default']['interval']) . " \\\n".
-            'REDIS_BACKEND=' . escapeshellarg($this->runtime['Redis']['host'] . ':' . $this->runtime['Redis']['port']) . " \\\n".
-            'REDIS_DATABASE=' . escapeshellarg($this->runtime['Redis']['database']) . " \\\n".
-            'REDIS_NAMESPACE=' . escapeshellarg($this->runtime['Redis']['namespace']) . " \\\n".
-            'COUNT=' . 1 . " \\\n".
-            'LOGHANDLER=' . escapeshellarg($this->runtime['Log']['handler']) . " \\\n".
-            'LOGHANDLERTARGET=' . escapeshellarg($this->runtime['Log']['target']) . " \\\n".
-            'php ' . escapeshellarg($resqueBin) . " \\\n";
-            $cmd .= ' >> '. escapeshellarg($logFile).' 2>&1" >/dev/null 2>&1 &';
+            $cmd = (($this->runtime['Default']['verbose']) ? 'VVERBOSE' : 'VERBOSE') . '=true ' . " \\\n".
+                'QUEUE=' . escapeshellarg($this->runtime['Default']['queue']) . " \\\n".
+                'PIDFILE=' . escapeshellarg($pidFile) . " \\\n".
+                'APPLICATION_ENV=' . escapeshellarg($env) ."\\\n".
+                'INTERVAL=' . escapeshellarg($this->runtime['Default']['interval']) . " \\\n".
+                'php' . escapeshellarg($bin) . "\\\n";
+            $cmd .= ' >> '. escapeshellarg($this->runtime['Log']['filename']).' 2>&1 >/dev/null 2>&1 &';
 
             $this->debug('Starting worker (' . $i . ')');
             $this->debug("Running command :\n\t" . str_replace("\n", "\n\t", $cmd));
